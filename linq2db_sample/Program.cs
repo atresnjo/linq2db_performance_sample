@@ -33,7 +33,7 @@ namespace linq2db_sample
         }
     }
 
-    [SimpleJob(RunStrategy.Throughput, 1, 5, 10)]
+    [SimpleJob(RunStrategy.Throughput, 1, 5, 50)]
     [MemoryDiagnoser]
     [MinColumn]
     [MaxColumn]
@@ -46,20 +46,70 @@ namespace linq2db_sample
                 .UseConnectionString(ProviderName.PostgreSQL, TestData.ConnectionString).Build();
 
         [Benchmark]
-        public async Task CreateEfCore()
+        public async Task CreateEfCore_10_Rows()
         {
             await using var context = _dbContextFactory.CreateDbContext(Array.Empty<string>());
             var service = new EFCoreService(context);
-            await service.Create();
+            await service.Create(10);
         }
-
+        
         [Benchmark]
-        public async Task CreateLinq2Db()
+        public async Task CreateLinq2Db_10_Rows()
         {
             await using var connection = new AppDataConnection(_options);
             var service = new Linq2DbService(connection);
-            await service.Create();
+            await service.Create(10);
         }
+        
+        [Benchmark]
+        public async Task CreateEfCore_100_Rows()
+        {
+            await using var context = _dbContextFactory.CreateDbContext(Array.Empty<string>());
+            var service = new EFCoreService(context);
+            await service.Create(100);
+        }
+        
+        
+        [Benchmark]
+        public async Task CreateLinq2Db_100_Rows()
+        {
+            await using var connection = new AppDataConnection(_options);
+            var service = new Linq2DbService(connection);
+            await service.Create(100);
+        }
+
+        [Benchmark]
+        public async Task CreateEfCore_500_Rows()
+        {
+            await using var context = _dbContextFactory.CreateDbContext(Array.Empty<string>());
+            var service = new EFCoreService(context);
+            await service.Create(500);
+        }
+        
+        [Benchmark]
+        public async Task CreateLinq2Db_500_Rows()
+        {
+            await using var connection = new AppDataConnection(_options);
+            var service = new Linq2DbService(connection);
+            await service.Create(500);
+        }
+        
+        [Benchmark]
+        public async Task CreateEfCore_1000_Rows()
+        {
+            await using var context = _dbContextFactory.CreateDbContext(Array.Empty<string>());
+            var service = new EFCoreService(context);
+            await service.Create(1000);
+        }
+        
+        [Benchmark]
+        public async Task CreateLinq2Db_1000_Rows()
+        {
+            await using var connection = new AppDataConnection(_options);
+            var service = new Linq2DbService(connection);
+            await service.Create(1000);
+        }
+  
     }
 
     internal class Program

@@ -18,10 +18,10 @@ namespace linq2db_sample.Linq2Db
             _connection = connection;
         }
 
-        public async Task Create()
+        public async Task Create(int count)
         {
-            var companies = new AutoFaker<Company>().RuleFor(x => x.Id, f => Guid.NewGuid()).Generate(5);
-            var categories = new AutoFaker<Category>().RuleFor(x => x.Id, f => Guid.NewGuid()).Generate(5);
+            var companies = new AutoFaker<Company>().Ignore(x => x.Contractids).RuleFor(x => x.Id, f => Guid.NewGuid()).Generate(count);
+            var categories = new AutoFaker<Category>().Ignore(x => x.Contractids).RuleFor(x => x.Id, f => Guid.NewGuid()).Generate(count);
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -29,12 +29,15 @@ namespace linq2db_sample.Linq2Db
             };
 
             var cbContractFaker = new AutoFaker<Contract>()
+                .Ignore(x => x.Category)
+                .Ignore(x => x.Company)
+                .Ignore(x => x.User)
                 .RuleFor(x => x.Id, f => Guid.NewGuid())
                 .RuleFor(x => x.UsersId, user.Id)
                 .RuleFor(x => x.CategoryId, f => f.PickRandom(categories).Id)
                 .RuleFor(x => x.CompanyId, f => f.PickRandom(companies).Id);
 
-            var contracts = cbContractFaker.Generate(10);
+            var contracts = cbContractFaker.Generate(count);
 
             await _connection.BeginTransactionAsync();
             await _connection.InsertAsync(user);
